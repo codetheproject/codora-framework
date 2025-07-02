@@ -1,0 +1,3 @@
+[submodule "@client/@client/codora"]
+	path = @client/@client/codora
+	url = https://github.com/codetheproject/codora-js.git

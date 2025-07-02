@@ -1,0 +1,1 @@
+//! Expected to be a service in codora stack simplfying emails in codora

@@ -1,0 +1,8 @@
+[package]
+name = "codora-framework-notification"
+edition = { workspace = true }
+
+[dependencies]
+
+[lints]
+workspace = true

@@ -1,0 +1,16 @@
+[package]
+name = "codora-framework-adapter"
+version = "0.1.0"
+edition = { workspace = true }
+
+[features]
+default = ["axum", "actix"]
+axum = ["dep:codora-framework-axum"]
+actix = []
+
+[dependencies]
+tracing = { workspace = true }
+codora-framework-axum = { path = "./crates/codora-framework-axum", optional = true }
+
+
+[dev-dependencies]
