@@ -1,0 +1,8 @@
+[package]
+name = "codora-framework-bucket"
+edition = { workspace = true }
+
+[dependencies]
+
+[lints]
+workspace = true

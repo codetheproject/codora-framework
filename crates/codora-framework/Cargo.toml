@@ -1,0 +1,30 @@
+[package]
+name = "codora-framework"
+license = "MIT"
+description = "Open source crates for Rust developers"
+readme = "README.md"
+homepage = "https://github.com/codetheproject/codora-framework"
+documentation = "https://docs.rs/codora-framework"
+repository = "https://github.com/codetheproject/codora-framework"
+keywords = ["web", "server", "orm", "authentication", "security"]
+categories = ["web-programming", "database", "authentication"]
+authors = ["West Sheriff <west.sh.mail@gmail.com>"]
+edition = { workspace = true }
+
+
+[features]
+default = []
+
+[dependencies]
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.142"
+tokio = { version = "1.46.1", features = ["full"] }
+derive-new = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tower = { workspace = true, features = ["full"] }
+tower-service = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[dev-dependencies]
+axum = { workspace = true }

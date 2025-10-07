@@ -1,0 +1,12 @@
+{
+  "name": "codora-framework",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "workspaces": ["packages/*"],
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

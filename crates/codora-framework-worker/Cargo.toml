@@ -1,0 +1,8 @@
+[package]
+name = "codora-framework-worker"
+edition = { workspace = true }
+
+[dependencies]
+
+[lints]
+workspace = true

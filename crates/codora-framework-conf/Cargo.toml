@@ -1,0 +1,30 @@
+[package]
+name = "codora-framework-conf"
+version = "0.1.0"
+edition.workspace = true
+
+[features]
+default = ["ron", "toml", "json5", "ini", "json", "yaml", "preserve-order"]
+ron = ["dep:ron"]
+toml = ["dep:toml"]
+json5 = ["dep:json5"]
+ini = ["dep:rust-ini"]
+json = ["dep:serde_json"]
+yaml = ["dep:yaml-rust2"]
+preserve-order = ["dep:indexmap"]
+
+[dependencies]
+thiserror = { workspace = true }
+ron = { version = "0.11.0", optional = true }
+json5 = { version = "0.4.1", optional = true }
+serde_json = { workspace = true, optional = true }
+rust-ini = { version = "0.21.3", optional = true }
+indexmap = { version = "2.11.4", optional = true }
+yaml-rust2 = { version = "0.10.4", optional = true }
+toml = { version = "0.9.7", features = ["parse"], optional = true }
+serde = { workspace = true, features = ["derive", "serde_derive"] }
+
+[dev-dependencies]
+
+[lints]
+workspace = true
