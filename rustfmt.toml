@@ -1,0 +1,14 @@
+array_width = 100
+attr_fn_like_width = 120
+chain_width = 40
+fn_call_width = 120
+fn_params_layout = "Compressed"
+max_width = 140
+merge_derives = true
+remove_nested_parens = true
+reorder_imports = true
+reorder_modules = true
+short_array_element_width_threshold = 100
+single_line_if_else_max_width = 40
+single_line_let_else_max_width = 40
+use_field_init_shorthand = true
