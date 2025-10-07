@@ -1,0 +1,19 @@
+[package]
+name = "valar"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+valar-core = { workspace = true }
+valar-macro = { workspace = true }
+valar-handler = { workspace = true }
+valar-identity = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+valar-handler = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+axum = "0.8.8"
+
+[lints]
+workspace = true

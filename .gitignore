@@ -1,0 +1,87 @@
+# Ignore Node.js dependencies and lockfiles
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lockb
+coverage
+bun.lock
+# Ignore Rust target directory (compiled binaries)
+target/
+**/target/
+
+# Ignore Rust-specific files
+Cargo.lock
+*.rs.bk
+*.rmeta
+
+# Ignore environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore build and generated files
+dist/
+out/
+.build/
+.cache/
+.docusaurus/
+.svelte-kit/
+.next/
+.vite/
+wasm-pack/
+pkg/
+
+# Ignore logs and debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+cargo-debug.log*
+cargo-test.log*
+turbo-debug.log*
+lerna-debug.log*
+*.log
+
+# Ignore temporary files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.sublime-workspace
+
+# Ignore IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Ignore GitHub Actions and deployment artifacts
+.github/workflows/node_modules/
+.github/workflows/dist/
+
+# Ignore WebAssembly (WASM) build artifacts
+*.wasm
+*.wat
+*.wast
+
+# docusaurus
+docs/.docusaurus
+.docusaurus
+**/.docusaurus
+
+# templates
+templates/*
+**/templates
+
+.turbo
+
+dev.*rs
+dev/**
+**/dev/**
