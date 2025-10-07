@@ -1,0 +1,36 @@
+[package]
+name = "codora-framework-bot"
+keywords = ["bot", "tlib", "telegram-library", "discord-library"]
+categories = ["web-programming"]
+edition = { workspace = true }
+
+
+[features]
+default = ["full"]
+full = ["codora-framework-bot-telegram", "codora-framework-bot-discord"]
+codora-framework-bot-telegram = []
+codora-framework-bot-discord = []
+
+[lints]
+workspace = true
+
+
+[dependencies]
+derive-new = "0.7.0"
+hyper = { version = "1.7.0", features = ["full"] }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+codora-framework-macro = { workspace = true, features = [
+    "codora-framework-bot-discord",
+    "codora-framework-bot-telegram",
+] }
+tokio = { workspace = true }
+http-body-util = "0.1"
+hyper-util = { version = "0.1", features = ["full"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+tower = { workspace = true, features = ["util"] }

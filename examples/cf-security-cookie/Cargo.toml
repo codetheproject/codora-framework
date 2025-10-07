@@ -1,0 +1,17 @@
+[package]
+name = "cf-security-cookie"
+version = "0.1.0"
+edition = { workspace = true }
+publish = false
+
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+anyhow = { workspace = true }
+tracing-subscriber = { workspace = true }
+cf = { path = "../../crates/codora-framework", features = [
+    "security",
+], package = "codora-framework" }
+axum = "0.8.7"
+
+[lints]
+workspace = true
