@@ -191,7 +191,7 @@ fn downcast_mut<'a, T: 'static>(boxed: &'a mut Box<dyn AnyClone + Send + Sync + 
 
 #[cfg(test)]
 mod tests {
-    use crate::valar::Map;
+    use super::*;
 
     #[test]
     fn test_handler_map() {

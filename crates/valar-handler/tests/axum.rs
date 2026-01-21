@@ -1,8 +1,8 @@
-use axum::{Extension, Router, body::Body, routing::get};
+use axum::{Extension, Router, body::Body, response::IntoResponse, routing::get};
 use http::{Request, request::Parts};
 use tower::ServiceExt;
-use valar_core::valar::Valar;
-use valar_handler::cookie::{handler::CookieHandler, state::CookieState};
+use valar_core::valar::{Valar, context::AuthenticationContext, handler::State};
+use valar_handler::cookie::handler::CookieHandler;
 
 #[tokio::test]
 async fn test_with_axum() -> anyhow::Result<()> {
@@ -12,11 +12,11 @@ async fn test_with_axum() -> anyhow::Result<()> {
             "/",
             get(|Extension(mut valar): Extension<Valar>, part: Parts| async move {
                 let _response = valar
-                    .ctx(&part)
-                    .authenticate::<CookieHandler>(CookieState {})
+                    .auth(part)
+                    .authenticate::<CookieHandler>(&30 as &dyn State)
                     .await;
 
-                ()
+                ().into_response()
             }),
         )
         .layer(Extension(valar));

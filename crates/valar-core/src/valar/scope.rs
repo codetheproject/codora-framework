@@ -1,6 +1,8 @@
-use crate::http::Request;
-use std::{convert::Infallible, pin::Pin};
-use tower::{Layer, Service};
+use crate::{
+    http::Request,
+    valar::handler::{Handler, State},
+};
+use tower_layer::Layer;
 
 #[derive(Debug, Clone)]
 pub enum Scope {
@@ -25,7 +27,7 @@ pub struct ScopeService<Scoped, S> {
 
 impl<Scoped, S> Layer<S> for ScopeLayer<Scoped>
 where
-    S: Service<Request> + Clone,
+    S: Handler<Request> + Clone,
     Scoped: Clone + Layer<S>,
 {
     type Service = ScopeService<Scoped::Service, S>;
@@ -37,15 +39,31 @@ where
         ScopeService::new(self.scope.clone(), scoped_service, inner)
     }
 }
-impl<Scoped, S> Service<Request> for ScopeService<Scoped, S> {
-    type Response = Infallible;
-    type Error = Infallible;
-    type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send + 'static>>;
+impl<Scoped, S> Handler<Request> for ScopeService<Scoped, S>
+where
+    S: Handler<Request>,
+{
+    type Response = S::Response;
+    type Error = S::Error;
+    type Future = S::Future;
 
-    fn poll_ready(&mut self, cx: &mut std::task::Context<'_>) -> std::task::Poll<Result<(), Self::Error>> {
+    fn authenticate(&self, request: Request, state: &dyn State) -> Self::Future {
         todo!()
     }
-    fn call(&mut self, _req: Request) -> Self::Future {
+
+    fn forbid(&self, request: Request, state: &dyn State) -> Self::Future {
+        todo!()
+    }
+
+    fn challenge(&self, request: Request, state: &dyn State) -> Self::Future {
+        todo!()
+    }
+
+    fn sign_out(&self, request: Request, state: &dyn State) -> Self::Future {
+        todo!()
+    }
+
+    fn sign_in(&self, request: Request, state: &dyn State, credential: super::credential::Credential) -> Self::Future {
         todo!()
     }
 }

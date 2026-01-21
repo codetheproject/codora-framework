@@ -1,9 +1,6 @@
 use super::scope::Scope;
-use crate::{
-    http::IntoRequest,
-    valar::{Valar, map::Map, scope::ScopeLayer},
-};
-use tower::Layer;
+use crate::valar::{Valar, scope::ScopeLayer};
+use tower_layer::Layer;
 
 #[derive(Debug, Clone, new)]
 pub struct Builder<S>(S);
@@ -12,6 +9,10 @@ impl<S> Builder<S>
 where
     S: Clone,
 {
+    pub fn into_inner(self) -> S {
+        self.0
+    }
+
     pub fn layer<L>(self, layer: L) -> Builder<S::Output>
     where
         S: ApplyLayer<L>,
@@ -188,10 +189,15 @@ impl_apply_layer!(
 
 #[cfg(test)]
 mod tests {
-    use std::convert::Infallible;
 
     use super::*;
-    use crate::{http::Request, util::NoopService};
+    use crate::BoxFuture;
+    use crate::http::{IntoRequest, Response};
+    use crate::valar::builder;
+    use crate::valar::{
+        credential::Credential,
+        handler::{Handler, State},
+    };
 
     #[derive(Debug, Clone)]
     struct FooLayer;
@@ -201,21 +207,69 @@ mod tests {
         inner: S,
     }
 
-    impl<S> tower::Service<Request> for FooService<S> {
-        type Response = Infallible;
-        type Error = Infallible;
-        type Future = std::pin::Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send + 'static>>;
+    impl<S, Request> Handler<Request> for FooService<S>
+    where
+        S: Handler<Request>,
+        Request: IntoRequest,
+    {
+        type Response = S::Response;
+        type Error = S::Error;
+        type Future = S::Future;
 
-        fn poll_ready(&mut self, cx: &mut std::task::Context<'_>) -> std::task::Poll<Result<(), Self::Error>> {
+        fn authenticate(&self, request: Request, state: &dyn State) -> Self::Future {
             todo!()
         }
 
-        fn call(&mut self, req: Request) -> Self::Future {
+        fn forbid(&self, request: Request, state: &dyn State) -> Self::Future {
+            todo!()
+        }
+
+        fn challenge(&self, request: Request, state: &dyn State) -> Self::Future {
+            todo!()
+        }
+
+        fn sign_out(&self, request: Request, state: &dyn State) -> Self::Future {
+            todo!()
+        }
+
+        fn sign_in(&self, request: Request, state: &dyn State, credential: Credential) -> Self::Future {
             todo!()
         }
     }
 
-    impl<S> tower::Layer<S> for FooLayer
+    #[derive(Debug, Clone)]
+    struct NoopHandler;
+
+    impl<Request> Handler<Request> for NoopHandler
+    where
+        Request: IntoRequest,
+    {
+        type Response = Response;
+        type Error = Response;
+        type Future = BoxFuture<'static, Result<Self::Response, Self::Error>>;
+
+        fn authenticate(&self, request: Request, state: &dyn State) -> Self::Future {
+            todo!()
+        }
+
+        fn forbid(&self, request: Request, state: &dyn State) -> Self::Future {
+            todo!()
+        }
+
+        fn challenge(&self, request: Request, state: &dyn State) -> Self::Future {
+            todo!()
+        }
+
+        fn sign_out(&self, request: Request, state: &dyn State) -> Self::Future {
+            todo!()
+        }
+
+        fn sign_in(&self, request: Request, state: &dyn State, credential: Credential) -> Self::Future {
+            todo!()
+        }
+    }
+
+    impl<S> tower_layer::Layer<S> for FooLayer
     where
         S: Clone,
     {
@@ -228,10 +282,11 @@ mod tests {
 
     #[test]
     fn test_builder() {
-        let builder = Builder::new((NoopService,))
-            .handler(NoopService)
+        let (_service_1, _) = builder::Builder::new((NoopHandler,))
             .layer(FooLayer)
-            .handler(NoopService)
-            .scope_layer(Scope::SignIn, FooLayer);
+            .handler(NoopHandler)
+            .into_inner();
+
+        // let _ = service_1.authenticate(request, state);
     }
 }

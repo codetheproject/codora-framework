@@ -1,14 +1,18 @@
-use tower::Service;
-
 use crate::{
-    http::{IntoRequest, IntoResponse, Response, body::Body},
-    metrics::Metrics,
+    http::{IntoRequest, IntoResponse, Response},
     valar::{
         Valar,
         credential::Credential,
-        handler::{AuthenticationHandler, SignInHandler, SignOutHandler, State},
+        handler::{Handler, State},
     },
 };
+
+pub trait AuthenticationContext<Request>: Sized
+where
+    Request: IntoRequest,
+{
+    fn auth(&self, request: Request) -> Context<'_, Request>;
+}
 
 #[derive(Debug, new)]
 pub struct Context<'a, Request> {
@@ -27,11 +31,10 @@ impl<'a, Request> Context<'a, Request>
 where
     Request: IntoRequest,
 {
-    pub async fn authenticate<H, T>(self, state: T) -> Result<Response, Error>
+    pub async fn authenticate<H>(self, state: &dyn State) -> Result<Response, Error>
     where
-        H: AuthenticationHandler<Request> + Clone + Send + Sync + 'static,
+        H: Handler<Request> + Clone + Send + Sync + 'static,
         H::Response: IntoResponse,
-        T: Sync + Send + 'static,
     {
         let handler = self
             .valar_instace
@@ -58,29 +61,29 @@ where
 
         todo!()
     }
-    pub async fn forbid<H, T>(self, state: T) -> Result<Response, Error>
+    pub async fn forbid<H>(self, state: &dyn State) -> Result<Response, Error>
     where
-        H: AuthenticationHandler<Request>,
+        H: Handler<Request>,
     {
         todo!()
     }
-    pub async fn challenge<H, T>(self, state: T) -> Result<Response, Error>
+    pub async fn challenge<H>(self, state: &dyn State) -> Result<Response, Error>
     where
-        H: AuthenticationHandler<Request>,
-    {
-        todo!()
-    }
-
-    pub async fn sign_out<H, T>(self, state: T) -> Result<Response, Error>
-    where
-        H: SignOutHandler<Request>,
+        H: Handler<Request>,
     {
         todo!()
     }
 
-    pub async fn sign_in<H, T>(self, state: T, credential: Credential) -> Result<Response, Error>
+    pub async fn sign_out<H>(self, state: &dyn State) -> Result<Response, Error>
     where
-        H: SignInHandler<Request>,
+        H: Handler<Request>,
+    {
+        todo!()
+    }
+
+    pub async fn sign_in<H>(self, state: &dyn State, credential: Credential) -> Result<Response, Error>
+    where
+        H: Handler<Request>,
     {
         todo!()
     }

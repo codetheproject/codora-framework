@@ -27,10 +27,18 @@ impl IntoRequest for Parts {
     }
 }
 
-impl IntoRequest for Body {
+impl IntoRequest for Request<Body> {
     type Body = Self;
 
     fn into_request(self) -> Request<Self::Body> {
+        todo!()
+    }
+}
+
+impl IntoResponse for Response<Body> {
+    type Body = Self;
+
+    fn into_response(self) -> Response<Self::Body> {
         todo!()
     }
 }

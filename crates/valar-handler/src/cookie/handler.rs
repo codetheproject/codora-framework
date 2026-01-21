@@ -3,10 +3,10 @@ use std::future::Ready;
 use pin_project_lite::pin_project;
 use valar_core::{
     http::IntoRequest,
-    valar::handler::{AuthenticationHandler, SignInHandler, SignOutHandler},
+    valar::handler::{Handler, State},
 };
 
-use crate::cookie::{CookieError, CookieResponse, CookieState};
+use crate::cookie::{CookieError, CookieResponse};
 
 // Cookie must be easy to clone we could use the inner scope
 #[derive(Clone, new)]
@@ -28,45 +28,31 @@ impl std::fmt::Debug for CookieHandler {
     }
 }
 
-impl<Request> AuthenticationHandler<Request> for CookieHandler
+impl<Request> Handler<Request> for CookieHandler
 where
     Request: IntoRequest + Sync + Send,
 {
     type Response = CookieResponse;
     type Error = CookieError;
-    type State = CookieState;
     type Future = Ready<Result<Self::Response, Self::Error>>;
 
-    fn authenticate(&self, request: Request, state: Self::State) -> Self::Future {
+    fn authenticate(&self, request: Request, state: &dyn State) -> Self::Future {
         todo!()
     }
 
-    fn forbid(&self, request: Request, state: Self::State) -> Self::Future {
+    fn forbid(&self, request: Request, state: &dyn State) -> Self::Future {
         todo!()
     }
 
-    fn challenge(&self, request: Request, state: Self::State) -> Self::Future {
+    fn challenge(&self, request: Request, state: &dyn State) -> Self::Future {
         todo!()
     }
-}
 
-impl<Request> SignOutHandler<Request> for CookieHandler
-where
-    Request: IntoRequest + Send + Sync,
-{
-    fn sign_out(&self, request: Request, state: Self::State) -> Self::Future {
+    fn sign_out(&self, request: Request, state: &dyn State) -> Self::Future {
         todo!()
     }
-}
 
-impl<Request> SignInHandler<Request> for CookieHandler
-where
-    Request: IntoRequest + Send + Sync,
-{
-    // Let assume (): Cookie
-    type Payload = Vec<()>;
-
-    fn sign_in(&self, request: Request, state: Self::State, payload: Self::Payload) -> Self::Future {
+    fn sign_in(&self, request: Request, state: &dyn State, credential: valar_core::valar::credential::Credential) -> Self::Future {
         todo!()
     }
 }

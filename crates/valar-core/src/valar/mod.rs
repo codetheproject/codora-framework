@@ -1,13 +1,10 @@
-use tower::util::BoxCloneSyncService;
-
 use crate::http::body::Body;
 use crate::http::{IntoRequest, Response};
+use crate::http::{IntoResponse, Request};
 use crate::metrics::Metrics;
 use crate::valar::builder::Builder as ValarBuilder;
-use crate::valar::context::Context;
-use crate::valar::handler::SignOutHandler;
-use crate::valar::map::Map;
-use crate::valar::request::Request;
+use crate::valar::context::{AuthenticationContext, Context};
+use crate::valar::handler::BoxCloneSyncHandler;
 use std::any::TypeId;
 use std::collections::HashMap;
 use std::fmt::Debug;
@@ -21,13 +18,24 @@ pub mod handler;
 pub mod map;
 pub mod request;
 pub mod scope;
+pub mod service;
 
 /// Valar error, these are error possible to happened in valar crates
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Clone, thiserror::Error)]
 #[error("{0}")]
 pub enum Error {
     #[error("{0:?}")]
     Response(Response),
+}
+
+impl IntoResponse for Error {
+    type Body = Body;
+
+    fn into_response(self) -> Response {
+        match self {
+            Error::Response(resp) => resp,
+        }
+    }
 }
 
 pub type Result<T, E = Error> = core::result::Result<T, E>;
@@ -49,27 +57,36 @@ impl Valar {
         ValarBuilder::new((handler,))
     }
 
-    pub fn ctx<'a, Request>(&'a self, request: Request) -> Context<'a, Request>
-    where
-        Request: IntoRequest + Debug,
-    {
-        Context::new(self, request)
-    }
-
     // get handler from valar instance
-    pub fn get_handler<H>(&self) -> Option<BoxCloneSyncService<Request<Body>, Response, Error>>
+    pub fn get_handler_ref<H>(&self) -> Option<&BoxCloneSyncHandler<Request<Body>, Response, Error>>
     where
-        H: Clone + Send + Sync + 'static,
+        H: 'static,
     {
         self.inner
             .service_map
             .get(&TypeId::of::<H>())
-            .cloned()
+    }
+
+    pub fn get_handler<H>(&self) -> Option<BoxCloneSyncHandler<Request<Body>, Response, Error>>
+    where
+        H: 'static,
+    {
+        self.get_handler_ref::<H>().cloned()
     }
 
     // Write into metrics
     pub fn record_metrics(&self, metrics: ()) {
         todo!()
+    }
+}
+
+impl<R> AuthenticationContext<R> for Valar
+where
+    R: IntoRequest,
+{
+    // This would allow users to authenticate as other's extension method would be provided
+    fn auth(&self, request: R) -> Context<'_, R> {
+        Context::new(self, request)
     }
 }
 
@@ -80,7 +97,7 @@ impl Default for Valar {
 }
 
 pub struct Inner {
-    service_map: HashMap<TypeId, BoxCloneSyncService<Request<Body>, Response, Error>, BuildHasherDefault<IdHasher>>,
+    service_map: HashMap<TypeId, BoxCloneSyncHandler<Request<Body>, Response, Error>, BuildHasherDefault<IdHasher>>,
     metrics: Metrics,
 }
 
@@ -115,68 +132,5 @@ impl Hasher for IdHasher {
     #[inline]
     fn finish(&self) -> u64 {
         self.0
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::{util::NoopService, valar::scope::Scope};
-    use request::Request;
-    use std::convert::Infallible;
-
-    #[derive(Debug, Clone)]
-    struct FooLayer;
-
-    #[derive(new, Clone)]
-    struct FooService<S> {
-        inner: S,
-    }
-
-    impl<S> tower::Service<Request<Body>> for FooService<S> {
-        type Response = Infallible;
-        type Error = Infallible;
-        type Future = std::pin::Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send + 'static>>;
-
-        fn poll_ready(&mut self, cx: &mut std::task::Context<'_>) -> std::task::Poll<Result<(), Self::Error>> {
-            todo!()
-        }
-
-        fn call(&mut self, req: Request<Body>) -> Self::Future {
-            todo!()
-        }
-    }
-
-    impl<S> tower::Layer<S> for FooLayer
-    where
-        S: Clone,
-    {
-        type Service = FooService<S>;
-
-        fn layer(&self, inner: S) -> Self::Service {
-            FooService::new(inner.clone())
-        }
-    }
-
-    #[test]
-    fn test_valar() -> anyhow::Result<()> {
-        let valar = Valar::with(NoopService)
-            .handler(NoopService)
-            .layer(FooLayer)
-            .handler(NoopService)
-            .scope_layer(Scope::SignIn, FooLayer)
-            .init();
-
-        let request = Request::builder()
-            .uri("/")
-            .method("GET")
-            .body(());
-
-        // let response = valar
-        //     .ctx(request)
-        //     .authenticate::<()>(state)
-        //     .await?;
-
-        Ok(())
     }
 }

@@ -7,9 +7,6 @@ use valar_core::http::IntoResponse;
 
 pub mod handler;
 
-#[derive(Debug, Clone)]
-pub struct CookieState {}
-
 #[derive(Debug, Default)]
 pub struct CookieResponse {}
 
